@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Attempt | Blink2EduCarrer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 30px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light {
+      
+      background: linear-gradient(135deg, #3cef45 0%, #f08a68 100%);
+    }
+
+    body.dark {
+      background: #1e1e1e;
+      color: #f0f0f0;
+    }
+
+    .editor {
+      
+      height: 320px;
+      width: 100%;
+      margin-top: 10px;
+      border: 2px solid #dc1818;
+      
+    }
+
+    .input-row {
+      margin-bottom: 15px;
+    }
+
+    input, button, select {
+      padding: 8px;
+      font-size: 16px;
+      margin-right: 10px;
+      
+    }
+
+    button {
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .extra{
+      background-color: #dc3545;
+    }
+    .run-btn {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .toggle-btn {
+      background-color: #28a745;
+      color: white;
+    }
+
+    pre {
+      background: #f9f9f9;
+      
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+      white-space: pre-wrap;
+      
+    }
+
+    .dark pre {
+      background: #2c2c2c;
+    }
+
+    .correct {
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    .incorrect {
+      color: #dc3545;
+      font-weight: bold;
+    }
+    
+  </style>
+  <script>
+    let tabSwitchCount = 0;
+
+    document.addEventListener("visibilitychange", function() {
+        if (document.hidden) {
+            tabSwitchCount++;
+            alert("You've switched tabs " + tabSwitchCount + " times!");
+        }
+    });
+</script>
+<script src="static\JS\history-control.js"></script>
+</head>
+<body class="light">
+  <h1>Blink2EduCarrer - Code Submission</h1>
+
+<div class="input-row">
+    <label for="question_id"><strong>Select Question:</strong></label>
+    <select id="question_id" onchange="updateQuestionText() ">
+      {% for q in questions %}
+        <option  value="{{ q.id }}" data-text="{{ q.question_text }}">Question {{ loop.index }}</option>
+      {% endfor %}
+    </select>
+    <label for="language_id"><strong>Select Language:</strong></label>
+    <select id="language_id" onchange="updateLanguageText() ">
+      <option value="python" language-text="python">python</option>
+      <option value="javascript" language-text="javascript">javascript</option>
+      <option value="cpp" language-text="c++">c++</option>
+      <option value="c" language-text="c">c</option>
+      <option value="java" language-text="java">java</option>
+      <option value="ruby" language-text="ruby">ruby</option>
+      <option value="c#" language-text="c#">c#</option>
+    </select>
+    <button class="run-btn" onclick="runCode()">▶ Run Code</button>
+    <button class="toggle-btn" onclick="toggleTheme()">🌙 Toggle Theme</button>
+    <div style="display: flex; gap: 0.5rem;">
+      <button class="run-btn" ><a href="{{ url_for('dashboard') }}" class="back-btn"><i class='bx bx-arrow-back'></i> Back</a></button>
+      <button class="toggle-btn"><a href="{{ url_for('logout') }}" class="logout-btn">Logout</a></button>
+  </div>
+</div>
+
+<div><strong>Question: </strong><span id="question_text"></span></div>
+<div><strong>Language: </strong><span id="language_text"></span></div>
+<div id="editor" class="editor"><!--# Write your Python code here --></div>
+<div id="results"></div>
+  <!-- ACE Editor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/ace.js"></script>
+  <script> 
+    const editor = ace.edit("editor");
+    editor.setTheme("ace/theme/github");
+    editor.session.setMode("ace/mode/python");
+    editor.setOptions({ useSoftTabs: true, tabSize: 4 });
+
+//     const editor = ace.edit("editor");
+// editor.setTheme("ace/theme/github");
+
+// // Get the initially selected language from the dropdown
+// const selectedLanguage = document.getElementById("language");
+
+// // Determine the correct Ace Editor mode and comment
+// let editorMode = "ace/mode/python"; // Default mode
+// let defaultComment = "# Write your Python code here"; // Default comment
+
+// if (selectedLanguage === "javascript") {
+//     editorMode = "ace/mode/javascript";
+//     defaultComment = "// Write your JavaScript code here";
+// } else if (selectedLanguage === "java") {
+//     editorMode = "ace/mode/java";
+//     defaultComment = "// Write your Java code here";
+// }
+
+// // Set the determined editor mode
+// editor.session.setMode(editorMode);
+
+// // Set default content
+// editor.setValue(defaultComment);
+
+// // Additional editor settings
+// editor.setOptions({ useSoftTabs: true, tabSize: 4 });
+
+
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.classList.contains("dark");
+      body.classList.toggle("dark", !isDark);
+      body.classList.toggle("light", isDark);
+      editor.setTheme(isDark ? "ace/theme/github" : "ace/theme/monokai");
+    }
+
+    async function runCode() {
+      const code = editor.getValue();
+      const questionId = document.getElementById("question_id").value;
+      const language = document.getElementById("language_id").value;
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      if (!questionId) {
+        alert("Please select a valid Question ID.");
+        return;
+      }
+
+      try {
+        const response = await fetch("/run_code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code: code,
+            question_id: questionId,
+            language: language
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          resultsDiv.innerHTML = `<pre><strong style="color:red;">Error:</strong> ${data.error}</pre>`;
+          return;
+        }
+
+        data.test_results.forEach((test, index) => {
+          resultsDiv.innerHTML += `
+<pre>
+<b>Test Case ${index + 1}</b>
+Input: ${test.input}
+Your Output: ${test.output}
+${test.error ? "Error: " + test.error : ""}
+Result: <span class="${test.is_correct ? 'correct' : 'incorrect'}">
+${test.is_correct ? '✔ Correct' : '❌ Incorrect'}
+</span>
+</pre>`;
+        });
+
+        resultsDiv.innerHTML += `<p><b>All Correct:</b> ${data.all_correct ? "✅ Yes" : "❌ No"}</p>`;
+
+      } catch (err) {
+        resultsDiv.innerHTML = `<pre><strong style="color:red;">Exception:</strong> ${err.message}</pre>`;
+      }
+    }
+
+
+
+    function updateQuestionText() {
+    const selectElement = document.getElementById("question_id");
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+
+    document.getElementById("question_text").innerText = selectedOption.getAttribute("data-text");
+}
+
+function updateLanguageText() {
+    const selectElement = document.getElementById("language_id");
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+
+    document.getElementById("language_text").innerText = selectedOption.getAttribute("language-text");
+}
+
+// Ensure functions run when dropdowns change
+document.getElementById("question_id").addEventListener("change", updateQuestionText);
+document.getElementById("language_id").addEventListener("change", updateLanguageText);
+
+// Call both functions on page load to set default values
+window.onload = function () {
+    updateQuestionText();
+    updateLanguageText();
+};
+  
+</script>
+<script src="{{ url_for('static', filename='JS/history-control.js') }}"></script>
+</body>
+</html>

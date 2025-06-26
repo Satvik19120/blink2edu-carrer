@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | Blink2EduCarrer</title>
+    <!-- Link to your CSS in static/CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/styles.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="static\JS\history-control.js"></script>
+</head>
+<body>
+  
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <!-- <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="dashboard-logo"> -->
+            <i class='bx bxs-graduation' style='font-size: 150px; color: #007bff;'></i>
+            <h2>Welcome, {{ student.username }}</h2>
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="{{ url_for('logout') }}" class="back-btn"><i class='bx bx-arrow-back'></i> Back</a>
+              <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+          </div>
+        </header>
+
+        <main>
+            <div class="dashboard-actions">
+                <a href="{{ url_for('create_assignment') }}" class="action-btn">
+                    <i class='bx bx-plus-circle'></i> Create Coding Assignment
+                </a>
+            </div>
+            <div class="dashboard-sections-container">
+            <!-- <section class="dashboard-section">
+                <h3><i class='bx bx-list-ul'></i> Quizzes</h3>
+                <ul class="dashboard-list">
+                  {% if quizzes %}
+                    {% for quiz in quizzes %}
+                        <li>
+                            <span>{{ quiz.title }}</span>
+                            <a href="{{ url_for('attempt_quiz_assignment', quiz_id=quiz.id) }}" class="attempt-btn">Attempt</a>
+                        </li>
+                    {% endfor %}
+                  {% else %}
+                    <li class="dashboard-empty">You have no quizzes to do.</li>
+                  {% endif %}
+                </ul>
+            </section> -->
+
+            <section class="dashboard-section">
+                <h3><i class='bx bx-code-alt'></i>Build Your Logic | Attempt Coding Assignments</h3>
+                <ul class="dashboard-list">
+                  {% if assignments %}
+                    {% for assignment in assignments | reverse%}
+                        <li>
+                            <span>{{ assignment.title }}</span>
+<span>                            <a href="{{ url_for('attempt_assignment', assignment_id=assignment.id) }}" class="attempt-btn">Attempt</a>
+                            <a href="{{ url_for('leaderboard_assignment', assignment_id=assignment.id) }}" class="attempt-btn">Leaderboard</a></span>
+                        </li> 
+                    {% endfor %}
+                  {% else %}
+                    <li class="dashboard-empty">You have no assignments to do.</li>
+                  {% endif %}
+                </ul>
+            </section>
+          </div>
+        </main>
+    </div>
+    <!-- Link to your JS in static/JS -->
+    <script src="{{ url_for('static', filename='JS/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='JS/history-control.js') }}"></script>
+</body>
+</html>

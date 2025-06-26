@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blink2EduCarrer - Welcome</title>
+  <!-- CSS file in static/CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='CSS/styles.css') }}" />
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <script src="static\JS\history-control.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="form-header">
+      <!-- <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Blink2EduCarrer Logo" class="logo"/> -->
+      <i class='bx bxs-graduation' style='font-size: 150px; color: #007bff;'></i>
+      <h1>Welcome to Blink2EduCarrer</h1>
+      <div class="toggle-btns">
+        <button id="loginBtn" class="active" type="button">Login</button>
+        <button id="registerBtn" type="button">Register</button>
+      </div>
+    </div>
+    <div class="form-section">
+      <!-- Login Form -->
+      <form id="loginForm" class="form active" method="POST" action="{{ url_for('login') }}">
+        <div class="input-group">
+          <!-- <i class='bx bx-envelope'></i> -->
+          <i class='bx bx-user'></i>
+          <input type="text" name="username" placeholder="username" required/>
+        </div>
+        <div class="input-group">
+          <i class='bx bx-lock'></i>
+          <input type="password" name="password" placeholder="Password" id="loginPassword" required/>
+          <i class='bx bx-show eye-icon' id="toggleLoginPassword"></i>
+        </div>
+        <button type="submit" class="submit-btn">Login</button>
+        <!-- <a href="#" class="link">Forgot password?</a> -->
+      </form>
+      <!-- Register Form -->
+      <form id="registerForm" class="form" method="POST" action="{{ url_for('register') }}">
+        <div class="input-group">
+          <i class='bx bx-user'></i>
+          <input type="text" name="username" placeholder="User Name" required/>
+        </div>
+        <!--<div class="input-group">
+          <i class='bx bx-envelope'></i>
+          <input type="email" name="email" placeholder="Email" required/>
+        </div>-->
+        <div class="input-group">
+          <i class='bx bx-lock'></i>
+          <input type="password" name="password" placeholder="Password" id="registerPassword" required/>
+          <i class='bx bx-show eye-icon' id="toggleRegisterPassword"></i>
+        </div>
+        <button type="submit" class="submit-btn">Register</button>
+      </form>
+    </div>
+    <!-- <a href="{{ url_for('logout') }}" class="logout-link">Logout</a> -->
+  </div>
+  <!-- JS file in static/JS -->
+  <script src="{{ url_for('static', filename='JS/script.js') }}"></script>
+  <script src="{{ url_for('static', filename='JS/history-control.js') }}"></script>
+</body>
+</html>
